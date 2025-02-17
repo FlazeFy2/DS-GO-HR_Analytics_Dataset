@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"log"
+	"math"
 	"os"
 	"sort"
 	"strconv"
@@ -74,6 +75,36 @@ func findMedian(values []float64) float64 {
 	}
 	return values[n/2]
 }
+func findMax(values []float64) float64 {
+	sort.Float64s(values)
+	return values[len(values)-1]
+}
+func findMin(values []float64) float64 {
+	sort.Float64s(values)
+	return values[0]
+}
+func findVariance(values []float64) float64 {
+	mean := findMean(values)
+	var variance float64
+	var count int
+	for _, value := range values {
+		if !math.IsNaN(value) {
+			variance += (value - mean) * (value - mean)
+			count++
+		}
+	}
+
+	if count > 1 {
+		variance /= float64(count - 1)
+	}
+
+	return variance
+}
+func findStandardDeviance(val float64) float64 {
+	val = math.Sqrt(val)
+	shift := math.Pow(10, float64(2))
+	return math.Round(val*shift) / shift
+}
 
 func main() {
 	// Read CSV
@@ -142,11 +173,21 @@ func main() {
 		}
 
 		fmt.Printf("\nFor column '%s'\n", colName)
+		max := findMax(columnValues)
+		fmt.Printf("Max : %.2f\n", max)
+		min := findMin(columnValues)
+		fmt.Printf("Min : %.2f\n", min)
+		rangenum := max - min
+		fmt.Printf("Range : %.2f\n", rangenum)
 		mean := findMean(columnValues)
 		fmt.Printf("Mean: %.2f\n", mean)
 		mode := findMode(columnValues)
 		fmt.Printf("Mode: %v\n", mode)
 		median := findMedian(columnValues)
 		fmt.Printf("Median: %.2f\n", median)
+		variance := findVariance(columnValues)
+		fmt.Printf("Variance : %.2f\n", variance)
+		std := findStandardDeviance(variance)
+		fmt.Printf("Standard Deviance : %.2f\n", std)
 	}
 }
